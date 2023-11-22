@@ -22,61 +22,45 @@
     <script>
         let app = new PIXI.Application({ width: 1180, height: 800 });
         document.body.appendChild(app.view);
-
-        //CLOUD ANIMATION IDLE DATA
-
-        const cloudSheetData = {
-            frames: {
-                frame1: {
-                    frame: { x: 0, y: 0, w: 200, h: 145 },
-                    sourceSize: { w: 200, h: 145 },
-                    spriteSourceSize: { x: 0, y: 0, w: 200, h: 145 }
-                },
-                frame2: {
-                    frame: { x: 200, y: 0, w: 200, h: 145 },
-                    sourceSize: { w: 200, h: 145 },
-                    spriteSourceSize: { x: 0, y: 0, w: 200, h: 145 }
-                },
-                frame3: {
-                    frame: { x: 400, y: 0, w: 200, h: 145 },
-                    sourceSize: { w: 200, h: 145 },
-                    spriteSourceSize: { x: 0, y: 0, w: 200, h: 145 }
-                },
-                frame4: {
-                    frame: { x: 600, y: 0, w: 200, h: 145 },
-                    sourceSize: { w: 200, h: 145 },
-                    spriteSourceSize: { x: 0, y: 0, w: 200, h: 145 }
-                },
-            },
-            meta: {
-                image: 'sprites/CLOUD_IDLE_SHEET.png',
-                format: 'RGBA8888',
-                size: { w: 800, h: 145 },
-                scale: 1
-            },
-            animations: {
-                idle: ['frame1', 'frame2', 'frame3', 'frame4'] //array of frames by name
+        let animations = {
+            "cloud": {
+                "attack": "",
+                "idle": "",
+                "move": "",
             }
         };
-        const cloudSheet = new PIXI.Spritesheet(
-            PIXI.BaseTexture.from(cloudSheetData.meta.image), cloudSheetData
-        );
+        let cloud;
+        let cloudSheet;
 
-        cloudSheet.parse();
-        let cloud = new PIXI.AnimatedSprite(cloudSheet.animations.idle);
+        async function loadAnimation() {
+            let response = await fetch('./JSON/cloudSheetData.json');
+            let json = await response.json();
+
+            let cloudSheet = new PIXI.Spritesheet(
+                PIXI.BaseTexture.from(json.meta.image), json
+            );
+            await cloudSheet.parse();
+            animations.cloud.attack = cloudSheet.animations.attack;
+            animations.cloud.idle = cloudSheet.animations. idle;
+
+            cloud = new PIXI.AnimatedSprite(cloudSheet.animations.idle);
+            cloud.animationSpeed = 0.1;
+            cloud.play();
+            cloud.scale.x *= -1;
+            cloud.anchor.set(0.5);
+            cloud.y = app.screen.height / 2;
+            cloud.x = cloud.width / 2 + 10;
+            app.stage.addChild(cloud);
+        };
+
         let attackButton = PIXI.Sprite.from("./sprites/attack.png")
         attackButton.y = app.screen.height - attackButton.height;
         attackButton.x = 10;
 
-        cloud.animationSpeed = 0.1;
-        cloud.play();
-        cloud.scale.x *= -1;
-        cloud.anchor.set(0.5);
-        cloud.y = app.screen.height / 2;
-        cloud.x = cloud.width / 2 + 10;
-        
-        app.stage.addChild(cloud);
+
         app.stage.addChild(attackButton);
+        
+        loadAnimation();
     </script>
 </body>
 
