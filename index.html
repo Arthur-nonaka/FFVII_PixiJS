@@ -56,10 +56,11 @@
         let attackButton = PIXI.Sprite.from("./sprites/attack.png")
         attackButton.y = app.screen.height - attackButton.height;
         attackButton.x = 10;
-
+        attackButton.on('pointerdown', (event) => { cloud = });
+        attackButton.eventMode = 'static';
 
         app.stage.addChild(attackButton);
-        
+
         loadAnimation();
     </script>
 </body>
