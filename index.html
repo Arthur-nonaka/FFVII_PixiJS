@@ -29,19 +29,16 @@
                 "move": "",
             }
         };
-        let cloud;
-        let cloudSheet;
+        async function init() {
+            let res = await fetch('./JSON/cloudSheetData.json');
+            let json = await res.json();
+            let cloud;
 
-        async function loadAnimation() {
-            let response = await fetch('./JSON/cloudSheetData.json');
-            let json = await response.json();
-
-            let cloudSheet = new PIXI.Spritesheet(
+            const cloudSheet = new PIXI.Spritesheet(
                 PIXI.BaseTexture.from(json.meta.image), json
             );
             await cloudSheet.parse();
-            animations.cloud.attack = cloudSheet.animations.attack;
-            animations.cloud.idle = cloudSheet.animations. idle;
+
 
             cloud = new PIXI.AnimatedSprite(cloudSheet.animations.idle);
             cloud.animationSpeed = 0.1;
@@ -51,17 +48,51 @@
             cloud.y = app.screen.height / 2;
             cloud.x = cloud.width / 2 + 10;
             app.stage.addChild(cloud);
-        };
+
+
+            animations.cloud.attack = new PIXI.AnimatedSprite(cloudSheet.animations.attack);
+            animations.cloud.idle = new PIXI.AnimatedSprite(cloudSheet.animations.idle);
+
+        }
+
+
+        // let cloud;
+        // let cloudSheet;
+
+        // async function loadAnimation() {
+        //     let response = await fetch('./JSON/cloudSheetData.json');
+        //     let json = await response.json();
+
+        //     let cloudSheet = new PIXI.Spritesheet(
+        //         PIXI.BaseTexture.from(json.meta.image), json
+        //     );
+        //     await cloudSheet.parse();
+        // animations.cloud.attack = new PIXI.AnimatedSprite(cloudSheet.animations.attacks);
+        //     animations.cloud.idle = new PIXI.AnimatedSprite(cloudSheet.animations.idle);
+        // };
 
         let attackButton = PIXI.Sprite.from("./sprites/attack.png")
         attackButton.y = app.screen.height - attackButton.height;
         attackButton.x = 10;
-        attackButton.on('pointerdown', (event) => { cloud = });
+        attackButton.on('pointerdown', (event) => {
+            cloud.textures = animations.cloud.attack;
+            cloud.play();
+            console.log("bas")
+        });
         attackButton.eventMode = 'static';
 
+        // cloud = animations.cloud.idle;
+        // cloud.animationSpeed = 0.1;
+        // cloud.play();
+        // cloud.scale.x *= -1;
+        // cloud.anchor.set(0.5);
+        // cloud.y = app.screen.height / 2;
+        // cloud.x = cloud.width / 2 + 10;
+        // app.stage.addChild(cloud);
         app.stage.addChild(attackButton);
 
-        loadAnimation();
+        // loadAnimation();
+        init();
     </script>
 </body>
 
