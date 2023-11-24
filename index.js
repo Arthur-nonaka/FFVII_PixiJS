@@ -6,8 +6,71 @@ let app = new PIXI.Application({
 app.renderer.backgroundColor = 0x23395d;
 
 document.body.appendChild(app.view);
-
 const Graphics = PIXI.Graphics;
+
+// CONTAINER BUTTON
+const buttonContainer = new PIXI.Container();
+buttonContainer.x = 20;
+buttonContainer.y = app.screen.height - 120;
+
+app.stage.addChild(buttonContainer);
+
+//BUTTON ATTACK
+
+const attackActionButton = new Graphics();
+attackActionButton.beginFill(0x2233cc).drawRect(0, 0, 200, 80).endFill();
+
+attackActionButton.eventMode = "static";
+attackActionButton.cursor = "pointer";
+
+attackActionButton.on("pointerdown", onClickAttack);
+
+buttonContainer.addChild(attackActionButton);
+
+//Text ATTACK
+
+const style = new PIXI.TextStyle({
+  fontFamily: "Montserrat",
+  fontSize: 44,
+  fill: "#119622",
+  stroke: "#000",
+  strokeThickness: 1,
+  dropShadow: true,
+  dropShadowDistance: 3,
+  dropShadowAngle: Math.PI / 2,
+  dropShadowBlur: 2,
+  dropShadowColor: "#256089",
+});
+
+const text = new PIXI.Text("Attack", style);
+text.anchor.set(0.5);
+text.position.set(attackActionButton.width / 2, attackActionButton.height / 2);
+
+buttonContainer.addChild(text);
+
+function onClickAttack() {
+  cloud.destroy();
+  cloud = new PIXI.AnimatedSprite(animations.cloud.attack);
+  cloud.position.set(200, 200);
+  cloud.anchor.x = 0.59;
+  cloud.anchor.y = 0.54;
+  cloud.scale.set(-1, 1);
+  app.stage.addChild(cloud);
+  cloud.play();
+  cloud.animationSpeed = 0.17;
+  cloud.loop = false;
+  cloud.onComplete = () => {
+    cloud.destroy();
+    cloud = new PIXI.AnimatedSprite(animations.cloud.idle);
+    cloud.position.set(200, 200);
+    cloud.anchor.x = 0.5;
+    cloud.anchor.y = 0.5;
+    cloud.scale.set(-1, 1);
+    app.stage.addChild(cloud);
+    cloud.gotoAndPlay(1);
+    cloud.animationSpeed = 0.1;
+  };
+}
 
 // const rectangle = new Graphics();
 // rectangle
@@ -85,11 +148,12 @@ const Graphics = PIXI.Graphics;
 
 let cloud;
 var animations = {
-  "cloud": {
-    "idle": [],
-    "attack": []
-  }
-}
+  cloud: {
+    idle: [],
+    attack: [],
+    dead: [],
+  },
+};
 
 PIXI.Assets.load("./JSON/cloudSheetData.json").then(() => {
   for (let i = 1; i < 5; i++) {
@@ -102,25 +166,21 @@ PIXI.Assets.load("./JSON/cloudSheetData.json").then(() => {
     animations.cloud.attack.push(texture);
   }
 
+  for (let i = 1; i < 2; i++) {
+    const texture = PIXI.Texture.from(`dead.png`);
+    animations.cloud.dead.push(texture);
+  }
+
   cloud = new PIXI.AnimatedSprite(animations.cloud.idle);
 
   cloud.position.set(200, 200);
   cloud.anchor.x = 0.5;
   cloud.anchor.y = 0.5;
-  cloud.scale.set(-1,1);
+  cloud.scale.set(-1, 1);
   app.stage.addChild(cloud);
   cloud.play();
   cloud.animationSpeed = 0.1;
 });
-
-setTimeout(() => {
-  cloud.currentFrame = 0;
-  console.log(cloud.currentFrame)
-  console.log(cloud.totalFrames)
-  cloud.textures = new PIXI.AnimatedSprite(animations.cloud.attack);
-  console.log("batata")
-},7000)
-
 
 // async function setup() {
 //    const cloudJSON = await PIXI.Assets.load('./JSON/cloudSheetData.json');
@@ -139,7 +199,6 @@ setTimeout(() => {
 //   cloud.play();
 //   cloud.animationSpeed = 0.1;
 // }
-
 
 // let animations = {
 //   cloud: {
